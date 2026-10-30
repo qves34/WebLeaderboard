@@ -38,6 +38,8 @@ Mercenary (Godot)  --POST rpc/submit_score-->  Supabase  <--SELECT scores--  web
   delete policy - zápis jde jen přes tu funkci, mazání jen z dashboardu.
 - Podrobnosti API, formát requestu a návrh GDScript kódu pro hru:
   **[docs/godot-integration.md](docs/godot-integration.md)**.
+- Kompletní popis fungování, datového modelu, bezpečnosti, napojení hry krok
+  za krokem a provozu: **[dokumentace.md](dokumentace.md)**.
 
 ## Požadavky
 
