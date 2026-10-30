@@ -3,9 +3,10 @@
 Kompletní popis toho, co leaderboard dělá, jak funguje uvnitř a jak se na něj
 napojí hra Mercenary. README je rychlý start, tohle je referenční text.
 
-Stav k 30. 10. 2026: **web a databázové schéma jsou hotové**, napojení ve hře
-je navržené (kapitola 9), ale **do repozitáře `mercenary` zatím nic
-přidáno nebylo**.
+Stav k 30. 10. 2026: **web, databázové schéma i napojení ve hře jsou hotové.**
+Web běží na https://webleaderboard.vercel.app, schéma je nasazené v Supabase
+a hra (repo `mercenary`) umí výsledky posílat - kapitola 9 popisuje, co přesně
+v ní přibylo.
 
 ---
 
@@ -420,8 +421,11 @@ jdou podle verze hromadně smazat nebo později filtrovat.
 
 ## 9. Napojení hry krok za krokem
 
-Všechny změny jsou v repu `mercenary`. Odhad: 150-200 řádků GDScriptu a dvě
-úpravy scén. Pořadí je zvolené tak, aby šlo po každém kroku hru spustit.
+Všechny změny jsou v repu `mercenary` (commit z 30. 10. 2026). Kroky níže
+popisují, co v něm přibylo a proč; kód v ukázkách odpovídá skutečným souborům.
+Nové soubory: `scripts/Leaderboard.gd`, `scripts/NicknameDialog.gd`,
+`scenes/NicknameDialog.tscn`. Upravené: `GameSettings.gd`, `MissionResults.gd`
++ `.tscn`, `Main.gd`, `SettingsMenu.gd` + `.tscn`, `project.godot`.
 
 ### Krok 1: nastavení v `GameSettings.gd`
 

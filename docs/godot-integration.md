@@ -1,7 +1,8 @@
 # Napojení hry (Godot 4.7)
 
-Co se musí do Mercenary přidat, aby uměla posílat výsledky na leaderboard.
-Tohle je návrh pro další krok - zatím **nic z toho ve hře není**.
+Co bylo do Mercenary přidáno, aby uměla posílat výsledky na leaderboard
+(repo `mercenary`, commit z 30. 10. 2026). Podrobný popis včetně UI a testu je
+v `dokumentace.md`, kapitola 9.
 
 ## Kategorie
 
