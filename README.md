@@ -1,119 +1,53 @@
 # WebLeaderboard
 
-Veřejný žebříček pro hru **Mercenary** (voxelová taktická FPS v Godotu,
-repo `qves34/mercenary`). Hráči z ní nahrávají výsledky pod nickname, web
-ukazuje nejlepší běhy v každé kategorii.
+Veřejný žebříček hry **Mercenary**, voxelové taktické FPS. Hráči nahrávají výsledky přímo ze hry pod svým nickem a web ukazuje, kdo je nejlepší v každé kategorii.
 
-Postavené na React + Vite, nasazuje se na Vercel přes `git push`. Data drží
-Supabase (Postgres) - stejný stack jako `watchlist`.
+**Web: https://webleaderboard.vercel.app**
 
 ## Co web umí
 
-- **Kategorie**: záložky módů **Classic / Annihilation / Endless / Story**, pod
-  nimi filtr mapy, obtížnosti (All / Easy / Normal / Hard) a operátora (All +
-  tři operátoři). Mapy se přepínají podle módu - Story má své dvě mise, ostatní
-  módy čtyři Mercenary mapy.
-- **Tabulka top 100**: pořadí, nick, skóre (u mission módů `/ 1000`, Endless bez
-  stropu), kills, čas, operátor se zbraní, obtížnost, datum. První tři místa
-  mají medaile.
-- **Hledání nicku** v aktuální kategorii - pořadí zůstává z plného seznamu.
-- **Profil hráče**: klik na nick otevře přehled všech jeho rekordů napříč
-  kategoriemi.
-- **Jeden záznam na hráče a kategorii** - horší pokus best nepřepíše, takže
-  jeden hráč nezaplní celou tabulku. Při filtru "All" na obtížnosti/operátorovi
-  se stejný nick může objevit vícekrát (jeho best v každé podkategorii).
-- Hlavička ukazuje počet hráčů a záznamů, patička má tlačítko Refresh.
-- Bez přihlášení, jen čtení. UI je anglicky, stejně jako hra.
+- **Módy**: záložky Classic, Annihilation, Endless a Story.
+- **Filtry**: mapa, obtížnost a operátor. Story má vlastní dvě mise, ostatní módy čtyři mapy.
+- **Top 100**: pořadí, nick, skóre, počet zabití, čas, operátor se zbraní, obtížnost a datum. První tři místa mají medaile.
+- **Hledání hráče**: v aktuální tabulce podle nicku. Pořadí hráče se při hledání nemění.
+- **Profil hráče**: po kliknutí na nick se ukážou všechny jeho rekordy.
+- **Počítadlo**: v hlavičce je počet hráčů a záznamů.
 
-## Jak data tečou
+Web je veřejný a nevyžaduje přihlášení. Jazykem je angličtina, stejně jako ve hře.
 
-```
-Mercenary (Godot)  --POST rpc/submit_score-->  Supabase  <--SELECT scores--  web
-```
+## Jak se hráč dostane na žebříček
 
-- Hra volá funkci `submit_score()` s nickem, tajným tokenem a výsledkem. Funkce
-  zvaliduje vstupy, ověří vlastnictví nicku (SHA-256 tokenu), ohlídá limit 1
-  upload / 3 s a zapíše jen pokud je výsledek lepší než dosavadní best.
-- Web čte tabulku `scores` anon klíčem. Tabulky nemají žádnou insert/update/
-  delete policy - zápis jde jen přes tu funkci, mazání jen z dashboardu.
-- Podrobnosti API, formát requestu a návrh GDScript kódu pro hru:
-  **[docs/godot-integration.md](docs/godot-integration.md)**.
-- Kompletní popis fungování, datového modelu, bezpečnosti, napojení hry krok
-  za krokem a provozu: **[dokumentace.md](dokumentace.md)**.
+1. Ve hře si zvolí nickname, a to po první dohrané misi nebo v Settings.
+2. Dohraje misi nebo běh v Endless.
+3. Hra výsledek nahraje a ukáže globální pořadí.
+4. Výsledek se objeví na webu.
 
-## Požadavky
+V Endless se hra na nick neptá, proto je potřeba ho nastavit předem v Settings.
 
-**Node 20.19+ nebo 22.12+** (Vite 8). Ověř `node -v`.
+## Pravidla žebříčku
 
-Supabase projekt (zdarma, https://supabase.com):
+- **Kategorie** je kombinace módu, mapy, operátora a obtížnosti.
+- Jeden hráč může být ve všech kategoriích a v každé má jen svůj nejlepší výsledek. Horší pokus nic nepřepíše.
+- Při filtru „All" u obtížnosti nebo operátora se může stejný nick objevit vícekrát, protože tabulka spojuje víc kategorií.
+- Skóre v Classic, Annihilation a Story je 0 až 1000. V Endless je to 10 bodů za zabití bez horní hranice.
+- Nick má 3 až 16 znaků a patří tomu, kdo ho použil první. Účty ani hesla neexistují.
 
-1. Založ projekt (nebo použij stávající - tabulky mají vlastní jména
-   `players`, `scores`, `player_profiles`, s watchlistem se netlučou).
-2. **SQL Editor** - vlož a spusť `supabase/schema.sql`.
-3. Volitelně spusť `supabase/seed.sql` - nahraje pár testovacích hráčů
-   `test_*`, ať je na webu něco vidět. Smazání:
-   `delete from public.players where nickname like 'test_%';`
-4. **Settings → API** - zkopíruj Project URL a `anon` `public` klíč.
+## Technologie
 
-Vše dej do `.env` (viz `.env.example`):
+React a Vite na Vercelu, data v Supabase. Každý `git push` do větve `main` nasadí novou verzi.
 
-```
-VITE_SUPABASE_URL=https://tvuj-projekt.supabase.co
-VITE_SUPABASE_ANON_KEY=tvuj_anon_klic
-```
-
-`VITE_` proměnné skončí jako čitelný text v JS balíčku - proto jen `anon`
-klíč, nikdy `service_role`.
-
-## Lokální vývoj
+Lokální spuštění vyžaduje Node 20.19+ nebo 22.12+ a soubor `.env` podle `.env.example`:
 
 ```bash
 npm install
-npm run dev       # http://localhost:5173
-npm run lint
-npm run build     # výstup v dist/
+npm run dev
 ```
 
-Bez `.env` appka naběhne a místo tabulky ukáže návod na nastavení.
+## Omezení
 
-## Nasazení na Vercel
+- Výsledky posílá hra a dají se zfalšovat. Server zachytí jen nesmyslné hodnoty, podezřelé záznamy se mažou ručně.
+- Kdo ztratí uložená data hry, přijde o svůj nick.
 
-1. Vercel → Add New Project → import repozitáře `qves34/WebLeaderboard`.
-   Framework Vite se detekuje sám (build `vite build`, output `dist`).
-2. **Environment Variables**: `VITE_SUPABASE_URL` a `VITE_SUPABASE_ANON_KEY`.
-3. Deploy. Každý další `git push` do `main` nasadí novou verzi.
+## Související projekt
 
-## Struktura
-
-```
-supabase/schema.sql       tabulky, RLS, funkce submit_score()
-supabase/seed.sql         testovací data
-docs/godot-integration.md co a jak přidat do hry
-src/lib/game.js           zrcadlo konstant z GameSettings.gd (mapy, operátoři, módy)
-src/lib/scores.js         dotazy do Supabase
-src/hooks/                useLeaderboard, useStats
-src/components/           Header, FilterBar, ScoreTable, PlayerModal, Footer
-```
-
-Když ve hře přibude mapa nebo operátor, stačí ho doplnit do `src/lib/game.js`.
-Neznámé ID web nepoloží, jen ho zobrazí syrově (`new_map` místo názvu).
-
-## Správa dat
-
-Vše z Supabase dashboardu (Table Editor):
-
-- **Smazat podezřelý záznam**: řádek v `scores`.
-- **Zabanovat hráče**: řádek v `players` - jeho skóre se smažou kaskádou a nick
-  se uvolní.
-- **Přejmenovat hráče**: upravit `players.nickname`, `scores` se přepíšou
-  kaskádou.
-- **Reset po změně balancu**: záznamy mají `game_version`, jde podle ní mazat
-  (`delete from scores where game_version < '0.2.0'`).
-
-## Omezení (vědomě)
-
-- Žádné účty. Nick patří tomu, kdo ho zabral první (token ve hře). Když hráč
-  smaže savy, token ztratí a nick je pro něj pryč.
-- Klient jde vždy zfalšovat. Server dělá jen hrubé meze (mission skóre ≤ 1000,
-  endless ≤ kills × 10) a rate limit. Pro hobby projekt stačí, zbytek je ruční
-  mazání v dashboardu.
+Hra je v repozitáři `qves34/mercenary`.
